@@ -10,30 +10,31 @@
 	RegisterSignal(peeked, COMSIG_PARENT_EXAMINE_MORE, .proc/on_closer_look)
 
 /datum/element/skirt_peeking/proc/can_skirt_peek(mob/living/carbon/human/peeked, mob/peeker)
-	var/mob/living/living = peeker
+	var/mob/living/living_peeker = peeker
 	var/obj/item/clothing/under/worn_uniform = peeked.get_item_by_slot(ITEM_SLOT_ICLOTHING)
 
 	// Unfortunately, you can't see it
-	// Going to be honest, i wanted to do something like a groin check, but that would
-	// Block EVERYTHING, and well, most of the others won't even cover it right?
-	// Should maybe consider using this for groin genitals.
-	if(istype(peeked.get_item_by_slot(ITEM_SLOT_OCLOTHING), /obj/item/clothing/suit/space))
+	var/obj/item/clothing/suit/outer_clothing = peeked.get_item_by_slot(ITEM_SLOT_OCLOTHING)
+	if(outer_clothing && CHECK_MULTIPLE_BITFIELDS(outer_clothing.body_parts_covered, CHEST | GROIN | LEGS | FEET))
 		return FALSE
 	//
 
 	// Valid clothing section
-	if(worn_uniform && is_type_in_typecache(worn_uniform.type, GLOB.skirt_peekable) \
+	if(worn_uniform && is_type_in_typecache(worn_uniform.type, GLOB.skirt_peekable))
 		// We are being peeked by a spooky ghost who sees all?
-		&& (isobserver(peeker) \
+		if(isobserver(peeker))
+			return TRUE
 		// Are you a living creature (and not us)?
-		|| (istype(living) && (peeker != peeked) \
+		if(istype(living_peeker) && (living_peeker != peeked))
 			// And are you under us while we're standing up?
-			&& (!(CHECK_BITFIELD(living.mobility_flags, MOBILITY_STAND)) && (CHECK_BITFIELD(peeked.mobility_flags, MOBILITY_STAND)) && (peeked.loc == living.loc)))) \
+			if(!(CHECK_BITFIELD(living_peeker.mobility_flags, MOBILITY_STAND)) && (CHECK_BITFIELD(peeked.mobility_flags, MOBILITY_STAND)) && (peeked.loc == living_peeker.loc))
+				return TRUE
 			// Or are you nearby and we are up high
-			|| ((locate(/obj/structure/table) in get_turf(peeked)) && CHECK_BITFIELD(peeked.mobility_flags, MOBILITY_STAND)) && \
+			// to-do SOMEONE PLEASE PORT /datum/element/climbable
+			var/obj/structure/high_ground = locate(/obj/structure) in get_turf(peeked)
+			if(high_ground && high_ground.climbable && CHECK_BITFIELD(peeked.mobility_flags, MOBILITY_STAND) && \
 				peeked.Adjacent(peeker))
-
-		return TRUE
+				return TRUE
 	return FALSE
 
 /datum/element/skirt_peeking/proc/on_examine(mob/living/carbon/human/peeked, mob/peeker, list/examine_list)
