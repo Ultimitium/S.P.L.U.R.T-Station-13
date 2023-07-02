@@ -14,7 +14,7 @@ export const Jukebox = (props, context) => {
     is_emagged,
     cost_for_play,
     has_access,
-    can_youtube
+    can_youtube,
   } = data;
   const songs = flow([
     sortBy(
@@ -38,13 +38,8 @@ export const Jukebox = (props, context) => {
                 onClick={() => act('toggle')}
               />
               {can_youtube
-                ? <Button
-                icon='download'
-                color="red"
-                onClick={() => act('urlsong')}
-                tooltip="Play a song from YouTube"
-                />
-                : <></>}
+                ? <Button icon="download" color="red" onClick={() => act('urlsong')} tooltip="Play a song from YouTube" />
+                : null}
             </>
           )}>
           <Stack>
