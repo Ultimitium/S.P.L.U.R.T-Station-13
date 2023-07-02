@@ -94,8 +94,8 @@
 			queuecooldown = world.time + (1 SECONDS)
 			playsound(src, 'sound/misc/compiler-failure.ogg', 25, TRUE)
 			return
-		to_chat(usr, "<span class='notice'>You spend [queuecost] credits to queue [selectedtrack.song_name].</span>")
-		log_econ("[queuecost] credits were inserted into [src] by [key_name(usr)] (ID: [C.registered_name]) to queue [selectedtrack.song_name].")
+		to_chat(usr, "<span class='notice'>You spend [queuecost] credits to queue [selection.song_name].</span>")
+		log_econ("[queuecost] credits were inserted into [src] by [key_name(usr)] (ID: [C.registered_name]) to queue [selection.song_name].")
 	queuedplaylist += selection
 	if(active)
 		say("[selection.song_name] has been added to the queue.")
