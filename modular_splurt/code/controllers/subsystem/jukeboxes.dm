@@ -17,6 +17,8 @@
 
 /datum/controller/subsystem/jukeboxes/Initialize()
 	. = ..()
+	if(!songs.len)
+		return
 	var/total = 0
 	for(var/datum/track/song in songs)
 		total += song.song_beat
