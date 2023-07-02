@@ -10,3 +10,13 @@
 # Admin upload limit #
 ## Max size admin uploads can have. Default is 5.0 MB
 #@UPLOAD_LIMIT_ADMIN 5242880
+
+# IC jukebox song downloading #
+## Allows players to play youtube audio from the jukebox
+#IC_JUKEBOX_DOWNLOAD
+
+# Jukebox youtube time limit #
+## Max length of a song from youtube that can be played in the Jukebox in seconds
+## 0 to deactivate this check
+## default is 20 minutes
+#@YT_TIME_LIMIT 1200

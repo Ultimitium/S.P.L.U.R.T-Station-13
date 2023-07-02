@@ -14,6 +14,7 @@ export const Jukebox = (props, context) => {
     is_emagged,
     cost_for_play,
     has_access,
+    can_youtube
   } = data;
   const songs = flow([
     sortBy(
@@ -28,12 +29,23 @@ export const Jukebox = (props, context) => {
         <Section
           title="Machine Controls"
           buttons={(
-            <Button
-              icon={active ? 'pause' : 'play'}
-              content={active ? 'Stop' : 'Play'}
-              selected={active}
-              disabled={!has_access}
-              onClick={() => act('toggle')} />
+            <>
+              <Button
+                icon={active ? 'pause' : 'play'}
+                content={active ? 'Stop' : 'Play'}
+                selected={active}
+                disabled={!has_access}
+                onClick={() => act('toggle')}
+              />
+              {can_youtube
+                ? <Button
+                icon='download'
+                color="red"
+                onClick={() => act('urlsong')}
+                tooltip="Play a song from YouTube"
+                />
+                : <></>}
+            </>
           )}>
           <Stack>
             <Stack.Item>
