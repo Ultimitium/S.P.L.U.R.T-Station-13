@@ -1,6 +1,3 @@
-/obj/machinery/jukebox
-	var/list/datum/track/del_queue = list()
-
 /obj/machinery/jukebox/ui_static_data(mob/user)
 	. = ..()
 	.["can_youtube"] = CONFIG_GET(flag/ic_jukebox_download)
@@ -53,24 +50,17 @@
 				to_chat(usr, span_warning("This song exceeds the maximum allowed length ([song_length_limit/60] minutes)"))
 				return
 
-			output = world.shelleo("[ytdl] -x --audio-format vorbis -o \"[data["title"] + " [REF(src)].%(ext)s"]\" \"[shell_scrubbed_input]\"")
-			errorlevel = output[SHELLEO_ERRORLEVEL]
-			stdout = output[SHELLEO_STDOUT]
-			if(errorlevel)
-				return
+			if(!fexists("[JUKEBOX_YOUTUBE_DOWNLOAD_PATH][data["title"]].ogg"))
+				output = world.shelleo("[ytdl] -x --audio-format vorbis -o \"[JUKEBOX_YOUTUBE_DOWNLOAD_PATH][data["title"]].%(ext)s\" \"[shell_scrubbed_input]\"")
+				errorlevel = output[SHELLEO_ERRORLEVEL]
+				stdout = output[SHELLEO_STDOUT]
+				if(errorlevel)
+					return
 
-			add_external_to_queue(new /datum/track(data["title"], file(data["title"] + " [REF(src)].ogg"), data["duration"] * 10, SSjukeboxes.bpm_average, 0, TRUE))
+			add_external_to_queue(new /datum/track(data["title"], file("[JUKEBOX_YOUTUBE_DOWNLOAD_PATH][data["title"]].ogg"), data["duration"] * 10, SSjukeboxes.bpm_average, 0))
 
-			log_admin("[key_name(usr)] played web sound: [song_youtube_url] at [ADMIN_LOOKUPFLW(src)]")
-			message_admins("[key_name(usr)] played web sound: [song_youtube_url] at [ADMIN_LOOKUPFLW(src)]")
-
-/obj/machinery/jukebox/activate_music()
-	. = ..()
-	if(!. || !playing || !playing?.delete_after)
-		return
-
-	// add song to the del queue if it's an internet download
-	LAZYADD(del_queue, playing)
+			log_admin("[ADMIN_LOOKUPFLW(usr)] played web sound: [song_youtube_url] at [ADMIN_LOOKUPFLW(src)]")
+			message_admins("[ADMIN_LOOKUPFLW(usr)] played web sound: [song_youtube_url] at [ADMIN_LOOKUPFLW(src)]")
 
 // it's the same as the add to queue act
 /obj/machinery/jukebox/proc/add_external_to_queue(datum/track/selection)
