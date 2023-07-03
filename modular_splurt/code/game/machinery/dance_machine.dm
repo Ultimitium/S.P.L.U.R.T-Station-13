@@ -50,17 +50,17 @@
 				to_chat(usr, span_warning("This song exceeds the maximum allowed length ([song_length_limit/60] minutes)"))
 				return
 
-			if(!fexists("[JUKEBOX_YOUTUBE_DOWNLOAD_PATH][data["title"]].ogg"))
-				output = world.shelleo("[ytdl] -x --audio-format vorbis -o \"[JUKEBOX_YOUTUBE_DOWNLOAD_PATH][data["title"]].%(ext)s\" \"[shell_scrubbed_input]\"")
+			var/path_title = sanitize(data["title"], list("/" = " ", "\\" = " "))
+			if(!fexists("[JUKEBOX_YOUTUBE_DOWNLOAD_PATH][path_title].ogg"))
+				output = world.shelleo("[ytdl] -x --audio-format vorbis -o \"[JUKEBOX_YOUTUBE_DOWNLOAD_PATH][path_title].%(ext)s\" \"[shell_scrubbed_input]\"")
 				errorlevel = output[SHELLEO_ERRORLEVEL]
 				stdout = output[SHELLEO_STDOUT]
 				if(errorlevel)
 					return
 
-			add_external_to_queue(new /datum/track(data["title"], file("[JUKEBOX_YOUTUBE_DOWNLOAD_PATH][data["title"]].ogg"), data["duration"] * 10, SSjukeboxes.bpm_average, 0))
-
 			log_admin("[ADMIN_LOOKUPFLW(usr)] played web sound: [song_youtube_url] at [ADMIN_LOOKUPFLW(src)]")
 			message_admins("[ADMIN_LOOKUPFLW(usr)] played web sound: [song_youtube_url] at [ADMIN_LOOKUPFLW(src)]")
+			INVOKE_ASYNC(src, .proc/add_external_to_queue, new /datum/track(data["title"], file("[JUKEBOX_YOUTUBE_DOWNLOAD_PATH][path_title].ogg"), data["duration"] * 10, SSjukeboxes.bpm_average, 0, TRUE))
 
 // it's the same as the add to queue act
 /obj/machinery/jukebox/proc/add_external_to_queue(datum/track/selection)
@@ -90,7 +90,7 @@
 	if(active)
 		say("[selection.song_name] has been added to the queue.")
 	else if(!playing)
-		activate_music()
+		INVOKE_ASYNC(src, .proc/activate_music)
 	playsound(src, 'sound/machines/ping.ogg', 50, TRUE)
 	queuecooldown = world.time + (3 SECONDS)
 	return TRUE
